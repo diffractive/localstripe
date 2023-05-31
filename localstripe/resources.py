@@ -1222,7 +1222,7 @@ class Invoice(StripeObject):
     def next_payment_attempt(self):
         # configurable envvar MAX_PAYMENT_FAILURE_RETRIES
         # simulating the customizable retry schedule on Stripe Dashboard
-        max_retries = os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3)
+        max_retries = int(os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3))
         if self.status in ('draft', 'open'):
             # we need to + 1 to include the first payment failure too
             # same as Stripe, next_payment_attempt would become null when there are no more retries
@@ -1275,7 +1275,7 @@ class Invoice(StripeObject):
         # updating attributes here for simplicity
         # TODO: implement invoice.updated handling and emit webhook event
         self.attempt_count += 1
-        if self.attempt_count >= os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3) + 1:
+        if self.attempt_count >= int(os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3)) + 1:
             self.auto_advance = False
             self.closed = True
         if self.status == 'void':
@@ -1293,7 +1293,7 @@ class Invoice(StripeObject):
         # updating attributes here for simplicity
         # TODO: implement invoice.updated handling and emit webhook event
         self.attempt_count += 1
-        if self.attempt_count >= os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3) + 1:
+        if self.attempt_count >= int(os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3)) + 1:
             self.auto_advance = False
             self.closed = True
         if self.status == 'void':
@@ -2985,9 +2985,8 @@ class Subscription(StripeObject):
                 charge.payment_method).type == 'sepa_debit'):
                 return Subscription._api_delete(self.id)
 
-        max_retries = os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3)
-        # delete the subscription when max_retries is reached
-        if invoice.attempt_count >= max_retries + 1:
+        # delete the subscription when max retries is reached
+        if invoice.attempt_count >= int(os.getenv("MAX_PAYMENT_FAILURE_RETRIES", 3)) + 1:
             return Subscription._api_delete(self.id)
 
         # no need to emit the updated event when the status remains past_due
