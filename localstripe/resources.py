@@ -1980,14 +1980,11 @@ class PaymentIntent(StripeObject):
         return obj
 
     @classmethod
-    def _api_retry(cls, id, payment_method=None, **kwargs):
+    def _api_retry(cls, id, **kwargs):
         """ api method specifically for retrying the payment intent
         """
         if kwargs:
             raise UserError(400, 'Unexpected ' + ', '.join(kwargs.keys()))
-
-        if payment_method is not None:
-            raise UserError(500, 'Not implemented')
 
         try:
             assert type(id) is str and id.startswith('pi_')
