@@ -3532,7 +3532,8 @@ class Session(StripeObject):
         obj = Session._api_retrieve(id)
         obj._expire_session()
         # also cancels payment intent
-        PaymentIntent._api_cancel(obj.payment_intent)
+        if obj.payment_intent:
+            PaymentIntent._api_cancel(obj.payment_intent)
         return obj
 
 extra_apis.append(('POST', '/v1/checkout/sessions/{id}/expire', Session._api_expire))
