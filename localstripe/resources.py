@@ -3037,6 +3037,8 @@ class Subscription(StripeObject):
             if billing_cycle_anchor is not None:
                 assert billing_cycle_anchor in ['now', 'unchanged'], \
                     'billing cycle anchor is {behavior} and not one of [now, unchanged]'.format(behavior=proration_behavior)
+            if metadata is not None:
+                assert type(metadata) is dict
             if prorate is not None:
                 assert type(prorate) is bool
             if proration_date is not None:
@@ -3126,6 +3128,9 @@ class Subscription(StripeObject):
                                         quantity=items[0]['quantity'],
                                         tax_rates=items[0]['tax_rates'])
                 self.items._list.append(item)
+
+        if metadata is not None:
+            self.metadata = metadata
 
         if tax_percent is not None:
             self.tax_percent = tax_percent
